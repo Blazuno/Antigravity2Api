@@ -110,6 +110,15 @@ const server = http.createServer(async (req, res) => {
 
   const parsedUrl = new URL(req.url, `http://${req.headers.host}`);
 
+  // Normalize path: collapse double slashes, alias /messages -> /v1/messages
+  parsedUrl.pathname = parsedUrl.pathname.replace(/\/+/g, "/");
+  if (parsedUrl.pathname === "/messages" || parsedUrl.pathname === "/messages/") {
+    parsedUrl.pathname = "/v1/messages";
+  }
+  if (parsedUrl.pathname === "/messages/count_tokens") {
+    parsedUrl.pathname = "/v1/messages/count_tokens";
+  }
+
   try {
     // Web UI (public)
     const uiResponse = await handleUiRoute(req, parsedUrl);
